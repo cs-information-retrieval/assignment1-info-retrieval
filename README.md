@@ -3,3 +3,4 @@ Assignment 1 of CS5180
 
 # Team Members
 - Jake Lepere
+- Mark Medlin
