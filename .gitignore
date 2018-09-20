@@ -1,2 +1,5 @@
 # Ignore all .vscode settings
 .vscode/
+
+# Ignore all java compiled classes
+*.class

@@ -1,11 +1,13 @@
-# How to Install Python Requirements
-Type into a terminal/command line:
+# How to Compile
+1. Make sure you are in the directory with the folder `inforetrieval_part1`
+2. Type the following into the terminal:
 ```
-python -m pip install -r requirements.txt
+javac -d bin/ inforetrieval_part1/*.java
 ```
 
-# How to Execute File
-Type into a terminal/command line:
+# How to Run
+1. Change into the `bin` directory
+2. Type the following into a terminal:
 ```
-python main.py
+java inforetrieval_part1.MainFrame
 ```
