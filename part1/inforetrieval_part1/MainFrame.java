@@ -32,6 +32,8 @@ public class MainFrame extends JFrame {
     private JButton fileChooserButton;
     private JFileChooser fileChooser;
     private File selectedFile;
+    private boolean firstTimeFileBrowsed;
+    private File prevPath;
     
     private JLabel seedLabel;
     private JTextField seedText;
@@ -68,6 +70,7 @@ public class MainFrame extends JFrame {
         this.setPreferredSize(new Dimension(800, 600));
         this.setLayout(new GridBagLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.firstTimeFileBrowsed = true;
         
         GridBagConstraints gridBagConstraints;
         
@@ -141,8 +144,7 @@ public class MainFrame extends JFrame {
         goButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println(arg0.getActionCommand());
-                Controller controller = Controller.getInstance();
+                Controller controller = CrawlController.getInstance();
                 controller.execute(getCsvInfo());
             }
         });
@@ -179,11 +181,19 @@ public class MainFrame extends JFrame {
      * @param evt
      */
     private void fileChooserButtonActionPerformed(ActionEvent evt) {
-        // Set the file chooser to the current directory
-        File currentDirectory = new File(System.getProperty("user.dir"));
-        fileChooser.setCurrentDirectory(currentDirectory);
+        if (firstTimeFileBrowsed) {
+            // Set the file chooser to the current directory
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            fileChooser.setCurrentDirectory(currentDirectory);
+            firstTimeFileBrowsed = false;
+        }
+        else {
+            // Set the file chooser to last chosen directory
+            fileChooser.setCurrentDirectory(this.prevPath);
+        }
         // Open the file chooser
         int returnVal = fileChooser.showOpenDialog(this);
+        this.prevPath = fileChooser.getSelectedFile();
         
         // If the user selects "OK"
         if (returnVal == JFileChooser.APPROVE_OPTION) {
