@@ -1,4 +1,4 @@
-package inforetrieval_part1;
+package inforetrieval_part1.main;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -21,6 +21,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import inforetrieval_part1.controller.Controller;
+import inforetrieval_part1.controller.CrawlController;
 
 public class MainFrame extends JFrame {
 
@@ -99,18 +102,20 @@ public class MainFrame extends JFrame {
         seedText.setEditable(false);
         // If this changes, enable the "Go" button
         seedText.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {}
-
-            @Override
             public void insertUpdate(DocumentEvent arg0) {
                 // Text changed, enable the go button
                 goButton.setEnabled(true);
             }
 
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {}
+            public void changedUpdate(DocumentEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
         });
         gridBagConstraints = getBaseGridbagConstraints(1, 1);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -142,7 +147,6 @@ public class MainFrame extends JFrame {
         goButton.setText("Go!");
         goButton.setEnabled(false);
         goButton.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent arg0) {
                 Controller controller = CrawlController.getInstance();
                 controller.execute(getCsvInfo());

@@ -1,4 +1,6 @@
-package inforetrieval_part1;
+package inforetrieval_part1.controller;
+
+import org.jsoup.*;
 
 public class CrawlController implements Controller {
     // Make this a Singleton
@@ -10,7 +12,7 @@ public class CrawlController implements Controller {
         }
         return instance;
     }
-    @Override
+    
     public void execute(String[] info) {
         // TODO
         // Call all the other functions
@@ -19,8 +21,9 @@ public class CrawlController implements Controller {
             System.out.println(s);
         }
     }
-    @Override
-    public void crawl() {
+    
+    
+    public void crawl(String[] info) {
         // TODO Auto-generated method stub
         
     }

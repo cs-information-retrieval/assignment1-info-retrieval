@@ -1,4 +1,4 @@
-package inforetrieval_part1;
+package inforetrieval_part1.controller;
 
 /**
  * Interface for the main controller class
@@ -7,5 +7,5 @@ package inforetrieval_part1;
  */
 public interface Controller {
     public void execute(String[] info);
-    public void crawl();
+    public void crawl(String[] info);
 }
