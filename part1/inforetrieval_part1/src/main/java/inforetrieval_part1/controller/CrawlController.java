@@ -1,8 +1,15 @@
 package inforetrieval_part1.controller;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import org.jsoup.*;
 
 public class CrawlController implements Controller {
+    
+    private HashSet<String> visitedList;
+    private LinkedList<String> frontier;
+    
     // Make this a Singleton
     private static CrawlController instance;
     private CrawlController() {};
