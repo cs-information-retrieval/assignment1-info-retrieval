@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>inforetrieval_part1</groupId>
-  <artifactId>main</artifactId>
+  <artifactId>info_retrieval_part1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>main</name>
+  <name>Info Retrieval Part 1</name>
   <url>http://maven.apache.org</url>
 
   <properties>

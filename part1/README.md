@@ -1,5 +1,5 @@
 # TODO
-Update this README for Maven project
+Update this README for [Maven](https://maven.apache.org/) project
 
 # How to Compile
 1. Make sure you are in the directory with the folder `inforetrieval_part1`

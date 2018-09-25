@@ -242,11 +242,23 @@ public class MainFrame extends JFrame {
                 }
                 else {
                     String[] splits = fileContents.get(0).split(",");
-                    this.setCsvInfo(splits);
                     
                     String seed = splits[0];
                     int maxPages = Integer.parseInt(splits[1]);
-                    String domainRestriction = splits[2];
+                    String domainRestriction = "";
+                    // If the domain restriction is not empty
+                    if (splits.length > 2) {
+                    	domainRestriction = splits[2];
+                    }
+                    
+                    // Set the class's csvInfo[] to our current seed, max pages, and domain restriction
+                    // This is to ensure that an empty domain restriction can still be used
+                    String[] localCsvInfo = new String[3];
+                    localCsvInfo[0] = seed;
+                    localCsvInfo[1] = String.valueOf(maxPages);
+                    localCsvInfo[2] = domainRestriction;
+                    this.setCsvInfo(localCsvInfo);
+                    
                     
                     seedText.setText(seed);
                     maxPagesText.setText(String.valueOf(maxPages));
