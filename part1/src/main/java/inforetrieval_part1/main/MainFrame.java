@@ -48,6 +48,7 @@ public class MainFrame extends JFrame {
     private JTextField domainRestrictionText;
     
     private JButton goButton;
+    private JButton stopButton;
     
     private String[] csvInfo;
     
@@ -150,6 +151,7 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent arg0) {
                 Controller controller = CrawlController.getInstance();
                 controller.execute(getCsvInfo());
+                JOptionPane.showMessageDialog(null, "Finished Crawling!");
             }
         });
         gridBagConstraints = getBaseGridbagConstraints(0, 4);
@@ -248,7 +250,7 @@ public class MainFrame extends JFrame {
                     String domainRestriction = "";
                     // If the domain restriction is not empty
                     if (splits.length > 2) {
-                    	domainRestriction = splits[2];
+                        domainRestriction = splits[2];
                     }
                     
                     // Set the class's csvInfo[] to our current seed, max pages, and domain restriction
