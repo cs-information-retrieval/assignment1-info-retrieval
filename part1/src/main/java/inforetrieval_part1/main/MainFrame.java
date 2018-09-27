@@ -1,5 +1,6 @@
 package inforetrieval_part1.main;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,7 +49,7 @@ public class MainFrame extends JFrame {
     private JTextField domainRestrictionText;
     
     private JButton goButton;
-    private JButton stopButton;
+    private JButton openReportButton;
     
     private String[] csvInfo;
     
@@ -100,23 +101,18 @@ public class MainFrame extends JFrame {
         getContentPane().add(seedLabel, gridBagConstraints);
         
         seedText = new JTextField();
-        seedText.setEditable(false);
+        //seedText.setEditable(false);
         // If this changes, enable the "Go" button
         seedText.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent arg0) {
                 // Text changed, enable the go button
                 goButton.setEnabled(true);
+                openReportButton.setEnabled(true);
             }
 
-            public void changedUpdate(DocumentEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
+            public void changedUpdate(DocumentEvent e) {}
 
-            public void removeUpdate(DocumentEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
+            public void removeUpdate(DocumentEvent e) {}
         });
         gridBagConstraints = getBaseGridbagConstraints(1, 1);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -128,7 +124,7 @@ public class MainFrame extends JFrame {
         getContentPane().add(maxPagesLabel, gridBagConstraints);
         
         maxPagesText = new JTextField();
-        maxPagesText.setEditable(false);
+        //maxPagesText.setEditable(false);
         gridBagConstraints = getBaseGridbagConstraints(1, 2);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(maxPagesText, gridBagConstraints);
@@ -139,7 +135,7 @@ public class MainFrame extends JFrame {
         getContentPane().add(domainRestrictionLabel, gridBagConstraints);
         
         domainRestrictionText = new JTextField();
-        domainRestrictionText.setEditable(false);
+        //domainRestrictionText.setEditable(false);
         gridBagConstraints = getBaseGridbagConstraints(1, 3);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(domainRestrictionText, gridBagConstraints);
@@ -149,6 +145,13 @@ public class MainFrame extends JFrame {
         goButton.setEnabled(false);
         goButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
+                // Set the csvInfo based on current GUI
+                String[] localCsvInfo = new String[3];
+                localCsvInfo[0] = seedText.getText();
+                localCsvInfo[1] = maxPagesText.getText();
+                localCsvInfo[2] = domainRestrictionText.getText();
+                setCsvInfo(localCsvInfo);
+                
                 Controller controller = CrawlController.getInstance();
                 controller.execute(getCsvInfo());
                 JOptionPane.showMessageDialog(null, "Finished Crawling!");
@@ -156,6 +159,23 @@ public class MainFrame extends JFrame {
         });
         gridBagConstraints = getBaseGridbagConstraints(0, 4);
         getContentPane().add(goButton, gridBagConstraints);
+        
+        
+        openReportButton = new JButton();
+        openReportButton.setText("Open report.html");
+        openReportButton.setEnabled(false);
+        openReportButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                File reportHtml = new File("report.html");
+                try {
+                    Desktop.getDesktop().browse(reportHtml.toURI());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        gridBagConstraints = getBaseGridbagConstraints(1, 4);
+        getContentPane().add(openReportButton, gridBagConstraints);
         
         
         //**********************************************************************
@@ -251,16 +271,7 @@ public class MainFrame extends JFrame {
                     // If the domain restriction is not empty
                     if (splits.length > 2) {
                         domainRestriction = splits[2];
-                    }
-                    
-                    // Set the class's csvInfo[] to our current seed, max pages, and domain restriction
-                    // This is to ensure that an empty domain restriction can still be used
-                    String[] localCsvInfo = new String[3];
-                    localCsvInfo[0] = seed;
-                    localCsvInfo[1] = String.valueOf(maxPages);
-                    localCsvInfo[2] = domainRestriction;
-                    this.setCsvInfo(localCsvInfo);
-                    
+                    }                   
                     
                     seedText.setText(seed);
                     maxPagesText.setText(String.valueOf(maxPages));
@@ -278,7 +289,7 @@ public class MainFrame extends JFrame {
     
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
         catch (Exception e) {
             e.printStackTrace();
