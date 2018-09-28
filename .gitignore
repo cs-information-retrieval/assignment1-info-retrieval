@@ -3,3 +3,10 @@
 
 # Ignore all java compiled classes
 *.class
+/.metadata/
+/.recommenders/
+.metadata
+.project
+.resources
+.classpath
+part2/.gitignore
