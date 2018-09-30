@@ -73,6 +73,7 @@ public class MainFrame extends JFrame {
      */
     public void init() {
         this.setPreferredSize(new Dimension(800, 600));
+        this.setTitle("Information Retrieval - Part 1: Crawler");
         this.setLayout(new GridBagLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.firstTimeFileBrowsed = true;

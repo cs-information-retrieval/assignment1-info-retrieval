@@ -1,16 +1,19 @@
-# TODO
-Update this README for [Maven](https://maven.apache.org/) project
+Information Retrieval - Assignment 1 Part 1
+
+# Setup
+1. Download [Java JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html). Make sure it is JDK 8 or higher.
+2. Download [Maven](https://maven.apache.org/download.cgi).
 
 # How to Compile
-1. Make sure you are in the directory with the folder `inforetrieval_part1`
-2. Type the following into the terminal:
+1. Make sure you are in the folder with the file "pom.xml"
+2. Type into the terminal:
 ```
-javac -d bin/ inforetrieval_part1/*.java
+mvn clean compile assembly:single
 ```
 
 # How to Run
-1. Change into the `bin` directory
-2. Type the following into a terminal:
+1. Make sure you are in the folder with the file "pom.xml"
+2. Type into the terminal:
 ```
-java inforetrieval_part1.MainFrame
+java -jar target/info_retrieval_part1-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
