@@ -14,6 +14,7 @@ public class ParseDocuments {
 		for (File f : folder.listFiles()) {
 			if (!f.isFile()) continue;
 			p.processContent(f);
+			break;
 		}
 		
 	}
