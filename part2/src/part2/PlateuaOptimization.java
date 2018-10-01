@@ -1,6 +1,7 @@
 package part2;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,23 +21,71 @@ import java.util.Scanner;
  */
 public class PlateuaOptimization implements ContentProcessor {
 	
-	public String processContent(File f) throws IOException {
-		Scanner scanner = new Scanner(f);
+	// tag and word identifiers
+	public static final int TAG_IDENTIFIER = 1;
+	public static final int WORD_IDENTIFIER = 0;
+	
+	public String processContent(File f) throws FileNotFoundException {
+		
+		// extract the full html, without spaces, from the file
+		Scanner fileScanner = new Scanner(f);
+		String fullHTML = "";
+		while (fileScanner.hasNextLine()) {
+			fullHTML += fileScanner.nextLine();
+		}
+		fileScanner.close();
+		
+		// list of tokens: tags or words
 		List<String> tokens = new LinkedList<>();
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine().trim();
-			for (String s : line.split(" ")) {
-				s = s.trim();
-				if (!s.isEmpty()) {
-					tokens.add(s);
+		
+		// list denoting token is tag or word
+		List<Integer> tokenIdentifier = new LinkedList<>();
+		
+		// string buffer for a tag of characters between tags
+		String s = "";
+		
+		// scan the full html text, one character at a time
+		Scanner fullHTMLScanner = new Scanner(fullHTML);
+		fullHTMLScanner.useDelimiter("");
+		while (fullHTMLScanner.hasNext()) {
+			
+			// get the next character
+			String c = fullHTMLScanner.next();
+			
+			if (c.equals("<")) {
+				/*
+				 * start of tag
+				 * 1) add each word that was found in between the previous tag and this tag
+				 * 2) start new tag string
+				 */
+				for (String word : s.trim().split(" ")) {
+					if (!word.isEmpty()) {
+						tokens.add(word);
+						tokenIdentifier.add(WORD_IDENTIFIER);
+					}
 				}
+				s = c;
+				
+			} else if (c.equals(">")) {
+				/*
+				 * end of tag
+				 * 1) add the tag
+				 * 2) start a new string
+				 */
+				s += c;
+				tokens.add(s);
+				tokenIdentifier.add(TAG_IDENTIFIER);
+				s = "";
+			} else {
+				s += c;
 			}
 		}
-		scanner.close();
+		fullHTMLScanner.close();
 		for (String token : tokens) {
 			System.out.println(token);
 		}
 		return "";
+		
 	}
 
 }
