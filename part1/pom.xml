@@ -34,6 +34,12 @@
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
+    <dependency>
+      <!-- https://github.com/pandzel/RobotsTxt -->
+      <groupId>com.panforge</groupId>
+      <artifactId>robots</artifactId>
+      <version>1.2.1</version>
+    </dependency>
   </dependencies>
 
   <build>
