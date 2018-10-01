@@ -7,7 +7,7 @@ public class ParseDocuments {
 
 	public static void main(String[] args) throws IOException {
 		
-		ContentProcessor p = new PlateuaOptimization();
+		ContentProcessor p = new PlateauOptimization();
 		
 		File folder = new File("./resources/test_html/");
 		

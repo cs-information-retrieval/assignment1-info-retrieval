@@ -21,7 +21,7 @@ import java.util.Scanner;
  * @author jlepere2
  * @date 09/28/2018
  */
-public class PlateuaOptimization implements ContentProcessor {
+public class PlateauOptimization implements ContentProcessor {
 	
 	public String processContent(File f) throws IOException {
 		
