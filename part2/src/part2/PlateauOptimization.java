@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -23,23 +24,38 @@ import java.util.Scanner;
  */
 public class PlateauOptimization implements ContentProcessor {
 	
+	// the slope calculate delta as a ratio of the total number of tokens in a document
+	private static final double DELTA_RATIO = 0.50;
+	private static final double SLOPE_IMPROVEMENT = 0.05;
+	private static final double MIN_TEXT_AREA_SIZE_RATIO = 0.1;
+	private static final double SLOPE_IMPROVEMENT_EXTENSION = -0.05;
+	private static final double INITIAL_BOUNDS_REMOVAL_RATIO = 0.1;
+	
 	public String processContent(File f) throws IOException {
 		
 		// extract the full HTML, without spaces, from the file
 		String fullHTML = extractHTML(f);
 		
 		// HTML token and document statistics
-		List<String> tokens = new LinkedList<>();
-		List<Integer> tokenIdentifier = new LinkedList<>();
-		List<Integer> tagCount = new LinkedList<>();
-		List<Integer> tokenCount = new LinkedList<>();
+		List<String> tokens = new ArrayList<>();
+		List<Integer> tokenIdentifier = new ArrayList<>();
+		List<Integer> tagCount = new ArrayList<>();
+		List<Integer> tokenCount = new ArrayList<>();
 		extractTokensAndStatistics(fullHTML, tokens, tokenIdentifier, tagCount, tokenCount);
 		
 		// write to CSV for testing
-		writeCSV(tokenIdentifier, tagCount, tokenCount, "test.csv");
+		//writeCSV(tokenIdentifier, tagCount, tokenCount, "test.csv");
 		
-		// return the extracted text area from the document
-		return extractTextArea(tokens, tokenIdentifier, tagCount, tokenCount);
+		// get the bounds for the text area
+		int[] initialBounds = new int[]{(int) (tokens.size() * INITIAL_BOUNDS_REMOVAL_RATIO),
+				tokens.size() - 1 - (int) (tokens.size() * INITIAL_BOUNDS_REMOVAL_RATIO)};
+		int[] bounds = getTextAreaBounds(tagCount, initialBounds);
+		
+		// print the bounds for testing
+		System.out.println(Arrays.toString(bounds));
+		
+		// return the extracted text area from the document defined by the boundary points
+		return extractTextArea(tokens, tokenIdentifier, bounds);
 		
 	}
 	
@@ -123,17 +139,125 @@ public class PlateauOptimization implements ContentProcessor {
 	}
 	
 	/**
-	 * Extracts the relevant text area from the document.
-	 * @param tokens a list of tokens
-	 * @param tokenIdentifier a list identifying the token as a tag or word
+	 * Gets the text area boundary points
 	 * @param tagCount the cumulative tag count
-	 * @param tokenCount the cumulative token count
+	 * @param currentBounds the current bounds for text area extraction to be used for recursive call
+	 * @return the boundary indexes of the text area
+	 */
+	public static int[] getTextAreaBounds(List<Integer> tagCount, int[] currentBounds) {
+		
+		// basecase
+		
+		// get the number of tokens
+		int numTokens = currentBounds[1] - currentBounds[0] + 1;
+		
+		// get the delta for the document
+		double delta = numTokens * DELTA_RATIO;
+		
+		// current min slope and indexes
+		int iMinSlope = currentBounds[0];
+		int jMinSlope = iMinSlope + (int) delta;
+		double minSlope = 1.0;
+		
+		// find the smallest slope
+		int i = iMinSlope;
+		int j = jMinSlope;
+		while (j < currentBounds[1]) {
+			// calculate the slope
+			double slope = ((double) tagCount.get(j) - (double) tagCount.get(i)) / delta;
+			
+			// update if smallest
+			if (slope < minSlope) {
+				iMinSlope = i;
+				jMinSlope = j;
+				minSlope = slope;
+				//System.out.println("OKAT");
+			}
+			
+			// increment
+			i += 1;
+			j += 1;
+			
+		}
+		
+		// get the previous slope
+		double prevSlope = ((double) tagCount.get(currentBounds[1]) - (double) tagCount.get(currentBounds[0])) / (currentBounds[1] - currentBounds[0]);
+		
+		// return if the slope didn't improve enough or too many tokens are removed
+		if (prevSlope - minSlope < SLOPE_IMPROVEMENT
+				|| ((double) numTokens) / tagCount.size() < MIN_TEXT_AREA_SIZE_RATIO) {
+			
+			// extend the boundaries to encompass points with minimal slope change
+			return extendBounds(currentBounds[0], currentBounds[1], prevSlope, tagCount);
+		}
+		
+		// try again with a smaller boundary
+		return getTextAreaBounds(tagCount, new int[] {iMinSlope, jMinSlope});
+	}
+	
+	/**
+	 * Try and stretch the bounds to include more points that do not change the slope too much.
+	 * @param i the current left bound
+	 * @param j the current right bound
+	 * @param slope the current slope
+	 * @param tagCount the cumulative tag count
+	 * @return the extend bounds
+	 */
+	public static int[] extendBounds(int i, int j, double slope, List<Integer> tagCount) {
+		
+		// new slope calculation
+		double newSlope;
+		
+		// continuously try and stretch the bounds
+		while (true) {
+			
+			// need improvement in either bound to continue
+			boolean improvement = false;
+			
+			// try improve left bound
+			if (i > 0) {
+				newSlope = ((double) tagCount.get(j) - (double) tagCount.get(i-1)) / (j - (i-1));
+				if (slope - newSlope >= SLOPE_IMPROVEMENT_EXTENSION) {
+					i -= 1;
+					improvement = true;
+				}
+			}
+			
+			// try improve right bound
+			if (j < tagCount.size() - 1) {
+				newSlope = ((double) tagCount.get(j+1) - (double) tagCount.get(i)) / ((j+1) - i);
+				if (slope - newSlope >= SLOPE_IMPROVEMENT_EXTENSION) {
+					j += 1;
+					improvement = true;
+				}
+			}
+			
+			// no improve made, break
+			if (!improvement) {
+				break;
+			}
+		}
+		
+		// return stretched bounds
+		return new int[] {i, j};
+	}
+	
+	/**
+	 * Extract the text area defined by the boundary indexes.
+	 * @param tokens a list of tokens, tags and words
+	 * @param bounds the boundary points
 	 * @return the extracted text area
 	 */
-	public static String extractTextArea(List<String> tokens, List<Integer> tokenIdentifier, List<Integer> tagCount, List<Integer> tokenCount) {
-		
-		// TODO
-		return "";
+	public static String extractTextArea(List<String> tokens, List<Integer> tokenIdentifier, int[] bounds) {
+		String textArea = "";
+		for (int i = bounds[0]; i <= bounds[1] && i < tokens.size(); i ++) {
+			textArea += tokens.get(i);
+			// add space to separate words
+			if (tokenIdentifier.get(i) == 0) {
+				textArea += " ";
+			}
+		}
+		return textArea;
 	}
 	
 	/**

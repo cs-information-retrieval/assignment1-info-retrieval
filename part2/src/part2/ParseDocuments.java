@@ -13,9 +13,12 @@ public class ParseDocuments {
 		
 		for (File f : folder.listFiles()) {
 			if (!f.isFile()) continue;
-			p.processContent(f);
-			break;
+			System.out.println(f.getName());
+			String s = p.processContent(f);
+			//break;
 		}
+		
+		//System.out.println(p.processContent(new File("./resources/test_html/keras.io.html")));
 		
 	}
 	
