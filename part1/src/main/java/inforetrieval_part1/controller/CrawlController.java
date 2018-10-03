@@ -1,8 +1,6 @@
 package inforetrieval_part1.controller;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -13,9 +11,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -32,7 +32,10 @@ public class CrawlController implements Controller {
 
     private LinkedList<String> frontier = new LinkedList<String>();
     private HashSet<String> visitedList = new HashSet<String>();
-    private int crawlDelay = 10; // in seconds
+    private int crawlDelay;  // in seconds
+    private int minSecondsToWait = 15;  // in seconds
+    private int maxSecondsToWait = 25;  // in seconds
+    private Random random = new Random();  // randomly generate seconds to wait each time
 
     // Getters and setters
     public LinkedList<String> getFrontier() {return this.frontier;}
@@ -115,6 +118,7 @@ public class CrawlController implements Controller {
      * @param info -
      * @throws IOException
      * @throws InterruptedException
+     * @throws URISyntaxException 
      */
     public void crawl(String[] info) throws IOException, InterruptedException {
         // TODO:
@@ -131,17 +135,30 @@ public class CrawlController implements Controller {
         // While the frontier is not empty AND while we haven't reached the max number of pages yet
         while (frontier.isEmpty() == false && visitedList.size() < maxPages) {
             String currentUrl = frontier.poll();
+            
+            // Convert the string to a URI. This is used to check only the domain, not the prefix
+            // "http" or "www.", and verify that it's not in the visited list.
+            // However, Jsoup can only connect to domains beginning with http
+            // so we will keep the original string
+            String domainOnlyUrl = this.deleteUrlPrefix(currentUrl);
+            
+            // Check if the link begins with "http://" or "https://"
+            // Jsoup can only connect to websites that begin with the above-mentioned prefix
+            currentUrl = this.checkHttpPrefix(currentUrl);
+            
             // Only crawl if the url is not in the visited list
-            if (visitedList.contains(currentUrl) == false) {
+            if (visitedList.contains(domainOnlyUrl) == false) {
                 // Add to the visited list
-                visitedList.add(currentUrl);
+                visitedList.add(domainOnlyUrl);
 
                 // Actually crawl the page
                 ArrayList<String> foundLinks = this.crawlOnePage(currentUrl);
 
                 // Put links in the frontier; double check if it is not already in visited list
                 for (String link : foundLinks) {
-                    if (visitedList.contains(link) == false) {
+                    String linkUriDomainOnly = this.deleteUrlPrefix(link);
+                    
+                    if (visitedList.contains(linkUriDomainOnly) == false) {
                         frontier.add(link);
                     }
                 }
@@ -157,14 +174,27 @@ public class CrawlController implements Controller {
      * @return An ArrayList of all crawled URLs
      * @throws IOException
      * @throws InterruptedException
+     * @throws URISyntaxException 
      */
     private ArrayList<String> crawlOnePage(String url) throws IOException, InterruptedException {
         ArrayList<String> foundLinks = new ArrayList<String>();
-        Connection.Response response = Jsoup.connect(url)
-                .ignoreHttpErrors(true)
-                .execute();
-        int statusCode = response.statusCode();
+        
+        Connection.Response response = null;
+        int statusCode = 404;  // default is not found
         Document doc = null;
+        int numberOfLinks = 0;
+        
+        // Try to connect to the url. If the URL cannot be connected due to whatever reason,
+        // our program will print out an error message and continue to crawl
+        try {
+            response = Jsoup.connect(url)
+                    .ignoreHttpErrors(true)
+                    .execute();
+            statusCode = response.statusCode();
+        } catch (IOException e) {
+            System.out.println(url + " could not be crawled");
+        }
+        
 
         // If it is a successful connection
         if (statusCode == 200) {
@@ -182,20 +212,31 @@ public class CrawlController implements Controller {
                 if (abs_href.equals("") == false) {
                     // Eliminate any # as they just lead to the same page
                     abs_href = abs_href.split("#")[0];
+                    
+                    // Check if the link begins with "http://" or "https://"
+                    // Jsoup can only connect to websites that begin with the above-mentioned prefix
+                    abs_href = this.checkHttpPrefix(abs_href);
+                    
+                    // Convert to domain only to check in visited list
+                    String abs_href_domain = this.deleteUrlPrefix(abs_href);
 
                     // Only add links that are not in the visited list
-                    if (this.visitedList.contains(abs_href) == false) {
+                    if (this.visitedList.contains(abs_href_domain) == false) {
                         foundLinks.add(abs_href);
+                        numberOfLinks++;
                     }
                 }
             }
 
+            // CrawlDelay will be a random integer from min-max seconds
+            crawlDelay = random.nextInt(maxSecondsToWait - minSecondsToWait) + minSecondsToWait;
+            
             // Wait crawlDelay seconds and then continue to crawl
             TimeUnit.SECONDS.sleep(crawlDelay);
         }
 
         // Generate a report for this website
-        this.generateReportHtml(statusCode, doc);
+        this.generateReportHtml(statusCode, doc, numberOfLinks);
         return foundLinks;
     }
 
@@ -220,9 +261,11 @@ public class CrawlController implements Controller {
      * Generate a report html
      * @param statusCode - The status code of the connection
      * @param doc - The web document
+     * @param numberOfLinks - Number of links that are not empty and has not been visited yet
+     * on the current page.
      * @throws IOException
      */
-    private void generateReportHtml(int statusCode, Document doc) throws IOException {
+    private void generateReportHtml(int statusCode, Document doc, int numberOfLinks) throws IOException {
         String currentDir = System.getProperty("user.dir");
 
         int pageId = this.visitedList.size() - 1;
@@ -230,9 +273,10 @@ public class CrawlController implements Controller {
         String clickableUrl = "N/A";
         String linkToDownloadedPage = "N/A";
         int httpStatusCode = statusCode;
-        int numberOfOutlinks = 0;
         int numberOfImages = 0;
 
+        
+        // Check if the website is successfully crawled
         if (doc != null) {
             // Max length of link
             int maxLinkLength = 20;
@@ -256,8 +300,6 @@ public class CrawlController implements Controller {
                         + "</a>");
             }
 
-            numberOfOutlinks = doc.select("a").size();
-
             numberOfImages = doc.select("img").size();
         }
 
@@ -270,7 +312,7 @@ public class CrawlController implements Controller {
         output.add(addBetweenTd(clickableUrl));
         output.add(addBetweenTd(linkToDownloadedPage));
         output.add(addBetweenTd(String.valueOf(httpStatusCode)));
-        output.add(addBetweenTd(String.valueOf(numberOfOutlinks)));
+        output.add(addBetweenTd(String.valueOf(numberOfLinks)));
         output.add(addBetweenTd(String.valueOf(numberOfImages)));
         output.add("\t\t</tr>");
         output.add("\n");
@@ -289,5 +331,70 @@ public class CrawlController implements Controller {
         htmlCode += input;
         htmlCode += "</td>";
         return htmlCode;
+    }
+    
+    
+    /**
+     * Check if the string begins with either "http://" or "https://"
+     * @param url - URL to check
+     * @return
+     */
+    public String checkHttpPrefix(String url) {
+        String strPattern = "(?:^https:\\/\\/|^http:\\/\\/)([\\S]*)";
+        Pattern pattern = Pattern.compile(strPattern);
+        Matcher matcher = pattern.matcher(url);
+        
+        // If the string does not start with "https://" or "http://"
+        if (matcher.matches() == false) {
+            url = "http://" + url;
+        }
+        
+        return url;
+    }
+    
+    
+    /**
+     * Delete http://, https://, and any www at the start of a URL.
+     * @param url - The current url to look at
+     * @return
+     */
+    public String deleteUrlPrefix(String url) {
+        String strPattern = "";
+        Pattern pattern;
+        Matcher matcher;
+        
+        // If string begins with "https://" or "http://"
+        // Group 0 - (?:^https:\\/\\/|^http:\\/\\/): Do not capture this group, matches beginning with https:// or http://
+        // Group 1 - ([\\S]*): Matches all non-whitespace character following group 0
+        strPattern = "(?:^https:\\/\\/|^http:\\/\\/)([\\S]*)";
+        pattern = Pattern.compile(strPattern);
+        matcher = pattern.matcher(url);
+        // Found a match
+        if (matcher.find()) {
+            url = matcher.group(1);
+        }
+                
+        
+        // If newly modified string begins with "www."
+        // Group 0 - (?:^www.): non-capturing group, matches beginning www.
+        // Group 1 - ([\\S]*): any non-whitespace character after the begining www.
+        strPattern = "(?:^www.)([\\S]*)";
+        pattern = Pattern.compile(strPattern);
+        matcher = pattern.matcher(url);
+        // Found a match
+        if (matcher.find()) {
+            url = matcher.group(1);
+        }
+        
+        // If the newly modified string ends with a "/" (forward slash) then delete that slash
+        strPattern = "([\\S]*)/$";
+        pattern = Pattern.compile(strPattern);
+        matcher = pattern.matcher(url);
+        // Found a match
+        if (matcher.find()) {
+            url = matcher.group(1);
+        }
+                
+        return url;
     }
 }

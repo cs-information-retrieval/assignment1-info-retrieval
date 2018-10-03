@@ -103,6 +103,7 @@ public class MainFrame extends JFrame {
         
         seedText = new JTextField();
         //seedText.setEditable(false);
+        seedText.setPreferredSize(new Dimension(200, 20));
         // If this changes, enable the "Go" button
         seedText.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent arg0) {
@@ -126,6 +127,7 @@ public class MainFrame extends JFrame {
         
         maxPagesText = new JTextField();
         //maxPagesText.setEditable(false);
+        maxPagesText.setPreferredSize(new Dimension(200, 20));
         gridBagConstraints = getBaseGridbagConstraints(1, 2);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(maxPagesText, gridBagConstraints);
@@ -137,6 +139,7 @@ public class MainFrame extends JFrame {
         
         domainRestrictionText = new JTextField();
         //domainRestrictionText.setEditable(false);
+        domainRestrictionText.setPreferredSize(new Dimension(200, 20));
         gridBagConstraints = getBaseGridbagConstraints(1, 3);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(domainRestrictionText, gridBagConstraints);
@@ -278,7 +281,6 @@ public class MainFrame extends JFrame {
                     maxPagesText.setText(String.valueOf(maxPages));
                     domainRestrictionText.setText(domainRestriction);
                     
-                    this.pack();
                 }
                 
             } catch (IOException ex) {
