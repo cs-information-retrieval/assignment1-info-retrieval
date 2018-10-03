@@ -1,5 +1,8 @@
+import convert_csv_to_xlsx
+
 text_filename = "output.txt"
 csv_output_filename = "output.csv"
+xlsx_output_filename = "output.xlsx"
 
 with open(text_filename, "r") as file:
     data = file.read()
@@ -19,3 +22,12 @@ with open(csv_output_filename, "w") as file:
         file.write(split1[1] + ",")
         file.write(split1[0])
         file.write("\n")
+
+print("Done converting to csv!")
+convert_to_xlsx = input("Would you like to convert to .xlsx file? Y/N: ")
+
+if convert_to_xlsx.lower() == "y":
+    convert_csv_to_xlsx.convert()
+    print("Finished converting to xlsx.")
+
+print("All done!")
