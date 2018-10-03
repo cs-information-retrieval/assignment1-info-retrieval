@@ -11145,6 +11145,7 @@
 ##.ads-block-link-text
 ##.ads-block-marketplace-container
 ##.ads-block-menu-center
+##.ads-block-panel-tipo-1
 ##.ads-block-top
 ##.ads-block-top-right
 ##.ads-border
@@ -13890,6 +13891,8 @@
 ##.content-list__ad-label
 ##.content-result-ads
 ##.content-unit-ad
+##.content1-ad
+##.content2-ad
 ##.contentAd
 ##.contentAd510
 ##.contentAdBox
@@ -14944,6 +14947,7 @@
 ##.header-ad234x60left
 ##.header-ad234x60right
 ##.header-adbox
+##.header-adcode
 ##.header-adplace
 ##.header-ads
 ##.header-ads-container

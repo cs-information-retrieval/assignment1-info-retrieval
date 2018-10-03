@@ -40,10 +40,12 @@ public class ReduceNoiseFromHtml
 			File[] htmlFiles = htmlFolder.listFiles(htmlFilter);
 			for(int i = 0 ; i < htmlFiles.length ; i++) {
 				FileWriter contentFile = new FileWriter(new File(contentFolder.getName()+"/"+htmlFiles[i].getName()+".txt"), false);
+				System.out.println("Processing: "+htmlFiles[i].getName());
 				contentFile.write(helper.extractContentDocument(Jsoup.parse(htmlFiles[i], "UTF-8", ""), adList));
 				contentFile.close();
 			}
 		}
+		System.out.println("Noise removal is done for all html files.");
 	}
 
 	
