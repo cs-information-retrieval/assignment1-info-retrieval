@@ -1,3 +1,6 @@
+Run count_word.sh in Content folder to get .xlsx file with word frequency. No need to run below command or python script to get csv or xlsx.
+
+
 To count frequency of words run below command on content folder.
 
 ```
