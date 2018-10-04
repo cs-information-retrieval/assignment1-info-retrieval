@@ -182,7 +182,8 @@ public class CrawlController implements Controller {
         Connection.Response response = null;
         int statusCode = 404;  // default is not found
         Document doc = null;
-        int numberOfLinks = 0;
+        int numberOfNonvisitedLinks = 0;
+        int totalNumberOfLinks = 0;
         
         // Try to connect to the url. If the URL cannot be connected due to whatever reason,
         // our program will print out an error message and continue to crawl
@@ -210,6 +211,9 @@ public class CrawlController implements Controller {
                 String abs_href = link.attr("abs:href").trim();
                 // We only care about links that are not null
                 if (abs_href.equals("") == false) {
+                    // Increment the total number of links
+                    totalNumberOfLinks++;
+
                     // Eliminate any # as they just lead to the same page
                     abs_href = abs_href.split("#")[0];
                     
@@ -223,7 +227,7 @@ public class CrawlController implements Controller {
                     // Only add links that are not in the visited list
                     if (this.visitedList.contains(abs_href_domain) == false) {
                         foundLinks.add(abs_href);
-                        numberOfLinks++;
+                        numberOfNonvisitedLinks++;
                     }
                 }
             }
@@ -236,7 +240,7 @@ public class CrawlController implements Controller {
         }
 
         // Generate a report for this website
-        this.generateReportHtml(statusCode, doc, numberOfLinks);
+        this.generateReportHtml(statusCode, doc, numberOfNonvisitedLinks, totalNumberOfLinks);
         return foundLinks;
     }
 
@@ -261,11 +265,12 @@ public class CrawlController implements Controller {
      * Generate a report html
      * @param statusCode - The status code of the connection
      * @param doc - The web document
-     * @param numberOfLinks - Number of links that are not empty and has not been visited yet
-     * on the current page.
+     * @param numberOfNonvisitedLinks - Number of non-visited non-empty links on the current page.
+     * @param totalNumberOfLinks - Total number of non-empty links
      * @throws IOException
      */
-    private void generateReportHtml(int statusCode, Document doc, int numberOfLinks) throws IOException {
+    private void generateReportHtml(int statusCode, Document doc,
+            int numberOfNonvisitedLinks, int totalNumberOfLinks) throws IOException {
         String currentDir = System.getProperty("user.dir");
 
         int pageId = this.visitedList.size() - 1;
@@ -275,7 +280,6 @@ public class CrawlController implements Controller {
         int httpStatusCode = statusCode;
         int numberOfImages = 0;
 
-        
         // Check if the website is successfully crawled
         if (doc != null) {
             // Max length of link
@@ -312,7 +316,8 @@ public class CrawlController implements Controller {
         output.add(addBetweenTd(clickableUrl));
         output.add(addBetweenTd(linkToDownloadedPage));
         output.add(addBetweenTd(String.valueOf(httpStatusCode)));
-        output.add(addBetweenTd(String.valueOf(numberOfLinks)));
+        output.add(addBetweenTd(String.valueOf(numberOfNonvisitedLinks)));
+        output.add(addBetweenTd(String.valueOf(totalNumberOfLinks)));
         output.add(addBetweenTd(String.valueOf(numberOfImages)));
         output.add("\t\t</tr>");
         output.add("\n");
