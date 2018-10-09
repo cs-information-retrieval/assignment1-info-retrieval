@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -123,11 +125,15 @@ public class CrawlController implements Controller {
     public void crawl(String[] info) throws IOException, InterruptedException {
         // TODO:
         // 1. Check robots.txt
-        // 2. Check domain restriction
 
         String seedUrl = info[0];
         int maxPages = Integer.parseInt(info[1]);
         String domainRestriction = info[2];
+        
+        // Add https to domainRestriction if it is not already there
+        if (domainRestriction.contains("http") == false) {
+            domainRestriction = "http://" + domainRestriction;
+        }
 
         // Add the seed URL to frontier
         frontier.add(seedUrl);
@@ -146,25 +152,55 @@ public class CrawlController implements Controller {
             // Jsoup can only connect to websites that begin with the above-mentioned prefix
             currentUrl = this.checkHttpPrefix(currentUrl);
             
-            // Only crawl if the url is not in the visited list
-            if (visitedList.contains(domainOnlyUrl) == false) {
-                // Add to the visited list
-                visitedList.add(domainOnlyUrl);
-
-                // Actually crawl the page
-                ArrayList<String> foundLinks = this.crawlOnePage(currentUrl);
-
-                // Put links in the frontier; double check if it is not already in visited list
-                for (String link : foundLinks) {
-                    String linkUriDomainOnly = this.deleteUrlPrefix(link);
-                    
-                    if (visitedList.contains(linkUriDomainOnly) == false) {
-                        frontier.add(link);
+            // Only crawl if domain restriction is met
+            if (this.checkDomainRestriction(currentUrl, domainRestriction)) {
+                // Only crawl if the url is not in the visited list
+                if (visitedList.contains(domainOnlyUrl) == false) {
+                    // Add to the visited list
+                    visitedList.add(domainOnlyUrl);
+    
+                    // Actually crawl the page
+                    ArrayList<String> foundLinks = this.crawlOnePage(currentUrl);
+    
+                    // Put links in the frontier; double check if it is not already in visited list
+                    for (String link : foundLinks) {
+                        String linkUriDomainOnly = this.deleteUrlPrefix(link);
+                        
+                        if (visitedList.contains(linkUriDomainOnly) == false) {
+                            frontier.add(link);
+                        }
                     }
+                    System.out.println(visitedList.size() + ". " + currentUrl);
                 }
-                System.out.println(visitedList.size() + ". " + currentUrl);
             }
         }
+    }
+    
+    
+    /**
+     * Check if the current link is within the domain restriction
+     * @param domainInput - The current link being looked at
+     * @param domainRestriction - The domain restriction
+     * @return
+     * @throws MalformedURLException 
+     */
+    public boolean checkDomainRestriction(String domainInput, String domainRestriction) throws MalformedURLException {
+        boolean validSite = false;
+        
+        // If the domain restriction is empty then all sites are allowed
+        if (domainRestriction.isEmpty()) {
+            validSite = true;
+        }
+        // Domain restriction is not empty
+        else {
+            String hostInputUrl = new URL(domainInput).getHost().replace("www.", "");
+            String hostRestrictionUrl = new URL(domainRestriction).getHost().replace("www.", "");
+            
+            // Compare the two hosts
+            validSite = hostInputUrl.equalsIgnoreCase(hostRestrictionUrl);
+        }
+        
+        return validSite;
     }
 
 
