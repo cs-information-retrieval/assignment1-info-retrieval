@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -62,7 +61,7 @@ public class PlateauOptimization implements ContentProcessor {
 				tokens.size() - 1 - (int) (tokens.size() * INITIAL_BOUNDS_REMOVAL_RATIO)};
 		int[] bounds = getTextAreaBounds(tagCount, initialBounds);
 		
-		// write to CSV for testing
+		// write to CSV if requested
 		try {
 			if (csvStatisticFilepath != null)
 				writeCSV(tokenIdentifier, tagCount, tokenCount, bounds, csvStatisticFilepath);
@@ -70,9 +69,6 @@ public class PlateauOptimization implements ContentProcessor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		// print the bounds for testing
-		System.out.println(Arrays.toString(bounds));
 		
 		// return the extracted text area from the document defined by the boundary points
 		return extractTextArea(tokens, tokenIdentifier, bounds);

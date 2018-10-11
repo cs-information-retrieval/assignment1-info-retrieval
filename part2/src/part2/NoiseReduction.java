@@ -91,8 +91,6 @@ public class NoiseReduction implements ContentProcessor {
 			}
 		}
 		
-		
-		System.out.println(htmlPage.toString().length());
 		return htmlPage.toString();
 
 	}
