@@ -1,11 +1,9 @@
 package part2;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -31,48 +29,50 @@ public class PlateauOptimization implements ContentProcessor {
 	private static final double SLOPE_IMPROVEMENT_EXTENSION = -0.05;
 	private static final double INITIAL_BOUNDS_REMOVAL_RATIO = 0.1;
 	
-	public String processContent(File f) throws IOException {
-		
-		// extract the full HTML, without spaces, from the file
-		String fullHTML = extractHTML(f);
+	// object variables
+	private String csvStatisticFilepath;
+	
+	/**
+	 * Creates a PlateauOptimization object for extracting document content.
+	 */
+	public PlateauOptimization() {
+		csvStatisticFilepath = null;
+	}
+	
+	/**
+	 * Set the output path of the csv file for writing statistics to be viewed on Excel.
+	 * @param csvStatisticFilepath the path of the file to write
+	 */
+	public void setCSVFilepath(String csvStatisticFilepath) {
+		this.csvStatisticFilepath = csvStatisticFilepath;
+	}
+	
+	public String processContent(String html) {
 		
 		// HTML token and document statistics
 		List<String> tokens = new ArrayList<>();
 		List<Integer> tokenIdentifier = new ArrayList<>();
 		List<Integer> tagCount = new ArrayList<>();
 		List<Integer> tokenCount = new ArrayList<>();
-		extractTokensAndStatistics(fullHTML, tokens, tokenIdentifier, tagCount, tokenCount);
-		
-		// write to CSV for testing
-		//writeCSV(tokenIdentifier, tagCount, tokenCount, "test.csv");
+		extractTokensAndStatistics(html, tokens, tokenIdentifier, tagCount, tokenCount);
 		
 		// get the bounds for the text area
 		int[] initialBounds = new int[]{(int) (tokens.size() * INITIAL_BOUNDS_REMOVAL_RATIO),
 				tokens.size() - 1 - (int) (tokens.size() * INITIAL_BOUNDS_REMOVAL_RATIO)};
 		int[] bounds = getTextAreaBounds(tagCount, initialBounds);
 		
-		// print the bounds for testing
-		System.out.println(Arrays.toString(bounds));
+		// write to CSV if requested
+		try {
+			if (csvStatisticFilepath != null)
+				writeCSV(tokenIdentifier, tagCount, tokenCount, bounds, csvStatisticFilepath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// return the extracted text area from the document defined by the boundary points
 		return extractTextArea(tokens, tokenIdentifier, bounds);
 		
-	}
-	
-	/**
-	 * Extracts the HTML, without spaces, from the file.
-	 * @param f the file containing the HTML
-	 * @return a string of the HTML, without spaces
-	 * @throws FileNotFoundException file not found exception
-	 */
-	public static String extractHTML(File f) throws FileNotFoundException {
-		Scanner fileScanner = new Scanner(f);
-		String fullHTML = "";
-		while (fileScanner.hasNextLine()) {
-			fullHTML += fileScanner.nextLine();
-		}
-		fileScanner.close();
-		return fullHTML;
 	}
 	
 	/**
@@ -265,18 +265,24 @@ public class PlateauOptimization implements ContentProcessor {
 	 * @param tokenIdentifier the list of token identifiers
 	 * @param tagCount the cumulative distribution count of tags
 	 * @param tokenCount the cumulative distribution of all tokens
+	 * @param bounds the boundary points for the text to extract
 	 * @param filepath the full path of the file to write
 	 * @throws IOException io exception
 	 */
-	public static void writeCSV(List<Integer> tokenIdentifier, List<Integer> tagCount, List<Integer> tokenCount, String filepath) throws IOException {
+	public static void writeCSV(List<Integer> tokenIdentifier, List<Integer> tagCount, List<Integer> tokenCount, int[] bounds, String filepath) throws IOException {
 		FileWriter testWriter = new FileWriter(new File(filepath));
 		Iterator<Integer> tokenIdentifierIterator = tokenIdentifier.iterator();
 		Iterator<Integer> tagCountIterator = tagCount.iterator();
 		Iterator<Integer> tokenCountIterator = tokenCount.iterator();
+		int count = 0;
 		while (tokenIdentifierIterator.hasNext()) {
-			testWriter.write(tokenIdentifierIterator.next()
+			String row = tokenIdentifierIterator.next()
 					+ "," + tokenCountIterator.next()
-					+ "," + tagCountIterator.next() + "\n");
+					+ "," + tagCountIterator.next() + ",";
+			row += count >= bounds[0] && count <= bounds[1] ? "1" : "0";
+			row += "\n";
+			testWriter.write(row);
+			count ++;
 		}
 		testWriter.close();
 	}

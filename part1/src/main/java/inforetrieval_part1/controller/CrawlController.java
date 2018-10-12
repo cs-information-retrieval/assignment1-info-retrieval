@@ -187,8 +187,11 @@ public class CrawlController implements Controller {
     public boolean checkDomainRestriction(String domainInput, String domainRestriction) throws MalformedURLException {
         boolean validSite = false;
         
+        // Take out the prefix ("http", "https", "www") for domain restriction
+        String noPrefixDomainRestriction = this.deleteUrlPrefix(domainRestriction).trim();
+        
         // If the domain restriction is empty then all sites are allowed
-        if (domainRestriction.isEmpty()) {
+        if (noPrefixDomainRestriction.isEmpty()) {
             validSite = true;
         }
         // Domain restriction is not empty
