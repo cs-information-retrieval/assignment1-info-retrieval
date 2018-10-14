@@ -118,6 +118,11 @@ public class CrawlThread implements Runnable {
         }
     }
     
+    /**
+     * Crawl one URL page given in the data string, parse doc and do operation
+     * such as find links, update report and add to repository.
+     * @param data String of URL to crawl
+     */
     private void doRealCrawl(String data) {
         ArrayList<URL> foundLinks = new ArrayList<URL>();
         
@@ -147,6 +152,10 @@ public class CrawlThread implements Runnable {
                  this.todoList.add(link.toString());
               }
            }
+           
+           // Report to console this thread and doc
+           System.out.println(Thread.currentThread().getName()+ " crawled " + data);
+           
         } catch (InterruptedException e1)
         {
            System.out.println("InterruptedException crawling " + data);
