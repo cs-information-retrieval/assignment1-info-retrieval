@@ -6368,6 +6368,8 @@
 ###multiLinkAdContainer
 ###multi_ad
 ###multibar-ads
+###mvp-foot-ad-wrap
+###mvp-post-bot-ad
 ###mvp_160_ad
 ###my-ads
 ###my-adsFPAD
@@ -11899,6 +11901,7 @@
 ##.adsrecnode
 ##.adsright
 ##.adss
+##.adss-rel
 ##.adsskyscraper
 ##.adssmall
 ##.adssquare
@@ -12642,6 +12645,7 @@
 ##.adverts
 ##.adverts-125
 ##.adverts-inline
+##.adverts2
 ##.adverts_RHS
 ##.advertspace
 ##.adverttext
@@ -13908,6 +13912,7 @@
 ##.content-ad-side
 ##.content-ad-widget
 ##.content-ad-wrapper
+##.content-ads
 ##.content-advert
 ##.content-advertisment
 ##.content-box-inner-adsense
@@ -15800,6 +15805,7 @@
 ##.m-ad-tvguide-box
 ##.m-advertisement
 ##.m-advertisement--container
+##.m-block-ad
 ##.m-dfp-ad-text
 ##.m-gallery-overlay--ad-top
 ##.m-header-ad
@@ -16239,6 +16245,7 @@
 ##.native_ad
 ##.nativead
 ##.nativeadasideplaceholder
+##.nativeads-unt
 ##.nativeadserversidecontentmodule
 ##.nature-ad
 ##.nav-ad
@@ -16344,6 +16351,7 @@
 ##.nw-taboola
 ##.nw-top-ad
 ##.nzs-ads
+##.o-ad-banner-top
 ##.o-ads
 ##.o-ads--center
 ##.o-advert
@@ -16760,6 +16768,7 @@
 ##.publicidade
 ##.publicidade-dotted
 ##.publicidade-full-banner
+##.publicidade-vertical-layout
 ##.publicity-box
 ##.puff-ad
 ##.puff-advertorials
