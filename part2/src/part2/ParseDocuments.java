@@ -36,22 +36,30 @@ public class ParseDocuments {
 		for (File f : (new File(inputFolder)).listFiles()) {
 			if (!f.isFile()) continue;
 			
-			// feedback
-			System.out.println("Processing: " + f.getName());
-			
-			// Extract the html from the file
-			String html = extractHTML(f);
-			
-			// reduce noise
-			html = noiseReduction.processContent(html);
-			
-			// plateau optimization
-			if (resultStatisticsFolder != null)
-				plateauOptimization.setCSVFilepath(new File(resultStatisticsFolder, f.getName()+".csv").toString());
-			html = plateauOptimization.processContent(html);
-			
-			// write the results
-			writeResults(html, new File(outputFolder, f.getName()).toString());
+			try {
+				// feedback
+				System.out.print("Processing: " + f.getName() + " - ");
+				
+				// Extract the html from the file
+				String html = extractHTML(f);
+				
+				// reduce noise
+				html = noiseReduction.processContent(html);
+				
+				// plateau optimization
+				if (resultStatisticsFolder != null)
+					plateauOptimization.setCSVFilepath(new File(resultStatisticsFolder, f.getName()+".csv").toString());
+				html = plateauOptimization.processContent(html);
+				
+				// write the results
+				writeResults(html, new File(outputFolder, f.getName()).toString());
+				
+				// feedback
+				System.out.println("DONE");
+			} catch (Exception e) {
+				// feedback
+				System.out.println("ERR");
+			}
 		}
 		
 	}
