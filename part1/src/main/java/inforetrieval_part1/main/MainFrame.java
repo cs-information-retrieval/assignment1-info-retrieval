@@ -29,6 +29,7 @@ import javax.swing.text.DefaultEditorKit;
 
 import inforetrieval_part1.controller.Controller;
 import inforetrieval_part1.controller.CrawlController;
+import inforetrieval_part1.controller.MultiThreadedCrawler;
 import inforetrieval_part1.controller.SingleThreadedCrawler;
 
 public class MainFrame extends JFrame {
@@ -164,18 +165,17 @@ public class MainFrame extends JFrame {
                 localCsvInfo[2] = domainRestrictionText.getText();
                 setCsvInfo(localCsvInfo);
                 
-                // Mark:
-                // Change this code to CrawlController if you want to test out 
-                // your multi-threaded code instead of single-threaded code
-                // Comment out which controller you do not want to use
-                
                 // Multi-threaded Controller
-                // Controller controller = CrawlController.getInstance();
+                MultiThreadedCrawler mtc = new MultiThreadedCrawler();
+                mtc.setSpecification(seedText.getText(), 
+                      Integer.parseInt(maxPagesText.getText()), 
+                      domainRestrictionText.getText());
+                mtc.execute(20);
                 
                 // Single-threaded Controller
-                Controller controller = SingleThreadedCrawler.getInstance();
+                //Controller controller = SingleThreadedCrawler.getInstance();
+                //controller.execute(getCsvInfo());
                 
-                controller.execute(getCsvInfo());
                 JOptionPane.showMessageDialog(null, "Finished Crawling!");
             }
         });
