@@ -34,6 +34,7 @@ public class CrawlController implements Controller {
 
     private LinkedList<String> frontier = new LinkedList<String>();
     private HashSet<String> visitedList = new HashSet<String>();
+    private RobotsTxtParser robotsTxtParser = new RobotsTxtParser(); 
     private int crawlDelay;  // in seconds
     private int minSecondsToWait = 15;  // in seconds
     private int maxSecondsToWait = 25;  // in seconds
@@ -123,9 +124,6 @@ public class CrawlController implements Controller {
      * @throws URISyntaxException 
      */
     public void crawl(String[] info) throws IOException, InterruptedException {
-        // TODO:
-        // 1. Check robots.txt
-
         String seedUrl = info[0];
         int maxPages = Integer.parseInt(info[1]);
         String domainRestriction = info[2];
@@ -154,24 +152,33 @@ public class CrawlController implements Controller {
             
             // Only crawl if domain restriction is met
             if (this.checkDomainRestriction(currentUrl, domainRestriction)) {
-                // Only crawl if the url is not in the visited list
-                if (visitedList.contains(domainOnlyUrl) == false) {
-                    // Add to the visited list
-                    visitedList.add(domainOnlyUrl);
-    
-                    // Actually crawl the page
-                    ArrayList<String> foundLinks = this.crawlOnePage(currentUrl);
-    
-                    // Put links in the frontier; double check if it is not already in visited list
-                    for (String link : foundLinks) {
-                        String linkUriDomainOnly = this.deleteUrlPrefix(link);
-                        
-                        if (visitedList.contains(linkUriDomainOnly) == false) {
-                            frontier.add(link);
+                // Check robots.txt to see if this site is allowed
+                if (robotsTxtParser.isAllowed(currentUrl)) {
+                    // Only crawl if the url is not in the visited list
+                    if (visitedList.contains(domainOnlyUrl) == false) {
+                        // Add to the visited list
+                        visitedList.add(domainOnlyUrl);
+        
+                        // Actually crawl the page
+                        ArrayList<String> foundLinks = this.crawlOnePage(currentUrl);
+        
+                        // Put links in the frontier; double check if it is not already in visited list
+                        for (String link : foundLinks) {
+                            String linkUriDomainOnly = this.deleteUrlPrefix(link);
+                            
+                            if (visitedList.contains(linkUriDomainOnly) == false) {
+                                frontier.add(link);
+                            }
                         }
+                        System.out.println("[" + visitedList.size() + "] " + currentUrl);
                     }
-                    System.out.println(visitedList.size() + ". " + currentUrl);
                 }
+                else {
+                    System.out.println("Robots.txt did not allow -> " + currentUrl);
+                }
+            }
+            else {
+                System.out.println("Domain restriction did not allow -> " + currentUrl);
             }
         }
     }
@@ -370,7 +377,7 @@ public class CrawlController implements Controller {
      * @param input - The input between the table data tags
      * @return
      */
-    private String addBetweenTd(String input) {
+    public String addBetweenTd(String input) {
         String htmlCode = "\t\t<td>";
         htmlCode += input;
         htmlCode += "</td>";
@@ -379,7 +386,8 @@ public class CrawlController implements Controller {
     
     
     /**
-     * Check if the string begins with either "http://" or "https://"
+     * Check if the string begins with either "http://" or "https://".
+     * If it doesn't, add "http" to the front
      * @param url - URL to check
      * @return
      */

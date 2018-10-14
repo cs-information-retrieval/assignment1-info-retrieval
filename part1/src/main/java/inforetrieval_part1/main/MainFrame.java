@@ -13,15 +13,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultEditorKit;
 
 import inforetrieval_part1.controller.Controller;
 import inforetrieval_part1.controller.CrawlController;
@@ -104,6 +108,7 @@ public class MainFrame extends JFrame {
         seedText = new JTextField();
         //seedText.setEditable(false);
         seedText.setPreferredSize(new Dimension(200, 20));
+        seedText.setComponentPopupMenu(this.getMenu());
         // If this changes, enable the "Go" button
         seedText.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent arg0) {
@@ -128,6 +133,7 @@ public class MainFrame extends JFrame {
         maxPagesText = new JTextField();
         //maxPagesText.setEditable(false);
         maxPagesText.setPreferredSize(new Dimension(200, 20));
+        maxPagesText.setComponentPopupMenu(this.getMenu());
         gridBagConstraints = getBaseGridbagConstraints(1, 2);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(maxPagesText, gridBagConstraints);
@@ -140,6 +146,7 @@ public class MainFrame extends JFrame {
         domainRestrictionText = new JTextField();
         //domainRestrictionText.setEditable(false);
         domainRestrictionText.setPreferredSize(new Dimension(200, 20));
+        domainRestrictionText.setComponentPopupMenu(this.getMenu());
         gridBagConstraints = getBaseGridbagConstraints(1, 3);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(domainRestrictionText, gridBagConstraints);
@@ -287,6 +294,28 @@ public class MainFrame extends JFrame {
                 ex.printStackTrace();
             }
         }
+    }
+    
+    
+    // Reference: https://stackoverflow.com/questions/30682416/java-right-click-copy-cut-paste-on-textfield
+    private JPopupMenu getMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        Action cut = new DefaultEditorKit.CutAction();
+        cut.putValue(Action.NAME, "Cut");
+        cut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+        menu.add( cut );
+
+        Action copy = new DefaultEditorKit.CopyAction();
+        copy.putValue(Action.NAME, "Copy");
+        copy.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control C"));
+        menu.add( copy );
+
+        Action paste = new DefaultEditorKit.PasteAction();
+        paste.putValue(Action.NAME, "Paste");
+        paste.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control V"));
+        menu.add( paste );
+        
+        return menu;
     }
 
     

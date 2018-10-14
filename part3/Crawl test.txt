@@ -1,0 +1,11 @@
+Crawl 1
+https://en.wikipedia.org/wiki/National_Coming_Out_Day
+50
+
+Crawl 2
+https://www.nytimes.com/
+100
+
+Crawl 3
+https://www.cpp.edu/~sci/computer-science/
+50
