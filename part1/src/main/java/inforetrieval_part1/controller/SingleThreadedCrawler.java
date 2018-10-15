@@ -12,12 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,8 +32,8 @@ public class SingleThreadedCrawler implements Controller {
     private final String REPOSITORY_DIR = "repository";
     private File reportHtml = new File("report.html");
 
-    private BlockingQueue<String> frontier = new LinkedBlockingDeque<String>();
-    private Set<String> visitedList = Collections.synchronizedSet(new HashSet<String>());
+    private LinkedList<String> frontier = new LinkedList<String>();
+    private HashSet<String> visitedList = new HashSet<String>();
     private RobotsTxtParser robotsTxtParser = new RobotsTxtParser(); 
     private int crawlDelay;  // in seconds
     private int minSecondsToWait = 15;  // in seconds
@@ -44,8 +41,8 @@ public class SingleThreadedCrawler implements Controller {
     private Random random = new Random();  // randomly generate seconds to wait each time
 
     // Getters and setters
-    public BlockingQueue<String> getFrontier() {return this.frontier;}
-    public Set<String> visitedList() {return this.visitedList;}
+    public LinkedList<String> getFrontier() {return this.frontier;}
+    public HashSet<String> visitedList() {return this.visitedList;}
 
     // End Variable Declaration + getters/setters
     //*************************************************************************

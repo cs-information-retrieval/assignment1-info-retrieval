@@ -21,16 +21,16 @@ public class CrawlThread implements Runnable {
     private boolean domainRestriction;
     private String restrictedDomain;
     private boolean testMode;
-    final static int POLITENESS_FIXED_DELAY = 30;           // in seconds
+    final static int POLITENESS_FIXED_DELAY = 30;// in seconds
     final static int POLITENESS_MIN_DELAY = 15;  // in seconds
     final static int POLITENESS_MAX_DELAY = 25;  // in seconds
     
-    private CrawlOne scraper = new CrawlOne();
+    private CrawlOne scraper;
     private RobotsTxtParser robot = new RobotsTxtParser();
     
     // Constructor
     public CrawlThread(Set<String> doneSet, LinkedBlockingQueue<String> todoList, 
-          String folder , File file) {
+          String folder , File file, int maxNumPages) {
         this.doneSet = doneSet;
         this.todoList = todoList;
         this.frontier = new LinkedList<String>();
@@ -38,6 +38,7 @@ public class CrawlThread implements Runnable {
         this.file = file;
         this.domainRestriction = false;
         this.testMode = false;
+        this.scraper = new CrawlOne(maxNumPages);
     }
     
     // Getters and setters

@@ -26,12 +26,14 @@ public class CrawlOne
    private int statusCode;
    private Response response;
    private Document doc;
+   private int maxNumPages;
    
    private Random random = new Random();  // randomly generate seconds to wait
    
    // Constructor
-   public CrawlOne() {
+   public CrawlOne(int maxNumPages) {
       this.init();
+      this.maxNumPages = maxNumPages;
    }
    
    private void init() {
@@ -107,6 +109,8 @@ public class CrawlOne
     * @throws IOException
     */
    public void generateReportHtml(int index, String reportFileName) {
+       if(index >= this.maxNumPages) return;
+       
        String currentDir = System.getProperty("user.dir");
 
        int pageId = index;
@@ -186,6 +190,8 @@ public class CrawlOne
     * @throws IOException
     */
     public void exportToRepository(int index, String repositoryDir) throws IOException {
+        if (index >= this.maxNumPages) return;
+        
         File repoDir = new File(repositoryDir);
         repoDir.mkdirs(); // make directory if it doesn't exist
         

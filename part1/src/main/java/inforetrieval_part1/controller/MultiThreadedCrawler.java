@@ -132,7 +132,7 @@ public class MultiThreadedCrawler
         int loop = 0;
         try
         {
-            while(this.doneSet.size() < this.numPagesToCrawl) {
+            while(this.doneSet.size() < this.numPagesToCrawl+10) {
                 elapsedTime = (System.currentTimeMillis() - this.startTime) / 1000;
                 System.out.println("LOOP " + (loop++) + ", Done=" +
                         this.doneSet.size() + "/" + this.numPagesToCrawl + 
@@ -180,7 +180,7 @@ public class MultiThreadedCrawler
         crawlers = new CrawlThread[this.numThreads];
         for(int i=0; i<crawlers.length; i++) {
             System.out.println("Creating thread "+i);
-            crawlers[i] = new CrawlThread(doneSet, todoList, REPOSITORY_DIR, reportHtml);
+            crawlers[i] = new CrawlThread(doneSet, todoList, REPOSITORY_DIR, reportHtml, this.numPagesToCrawl);
             crawlers[i].setDomainRestriction(this.domainRestriction);
             crawlers[i].setTestMode(this.testMode);
             crawlers[i].startCrawler();
