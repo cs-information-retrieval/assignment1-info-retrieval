@@ -173,8 +173,8 @@ public class MainFrame extends JFrame {
                 mtc.execute(20);
                 
                 // Single-threaded Controller
-                //Controller controller = SingleThreadedCrawler.getInstance();
-                //controller.execute(getCsvInfo());
+                // Controller controller = SingleThreadedCrawler.getInstance();
+                // controller.execute(getCsvInfo());
                 
                 JOptionPane.showMessageDialog(null, "Finished Crawling!");
             }
