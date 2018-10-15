@@ -166,15 +166,15 @@ public class MainFrame extends JFrame {
                 setCsvInfo(localCsvInfo);
                 
                 // Multi-threaded Controller
-                MultiThreadedCrawler mtc = new MultiThreadedCrawler();
-                mtc.setSpecification(seedText.getText(), 
-                      Integer.parseInt(maxPagesText.getText()), 
-                      domainRestrictionText.getText());
-                mtc.execute(20);
+                // MultiThreadedCrawler mtc = new MultiThreadedCrawler();
+                // mtc.setSpecification(seedText.getText(), 
+                      // Integer.parseInt(maxPagesText.getText()), 
+                      // domainRestrictionText.getText());
+                // mtc.execute(20);
                 
                 // Single-threaded Controller
-                // Controller controller = SingleThreadedCrawler.getInstance();
-                // controller.execute(getCsvInfo());
+                Controller controller = SingleThreadedCrawler.getInstance();
+                controller.execute(getCsvInfo());
                 
                 JOptionPane.showMessageDialog(null, "Finished Crawling!");
             }
