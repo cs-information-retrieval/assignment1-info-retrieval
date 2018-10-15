@@ -64,12 +64,12 @@ public class NoiseReduction implements ContentProcessor {
 		Document htmlPage = Jsoup.parse(html);
 		
 		//Removing nav bars
-		htmlPage.select("nav, .nav, .navbar, [class*=nav], [id*=mw-panel], [class*=navigation], [id*=navigation], [class*=recirculation], [id*=recirculation]").remove();
+		//htmlPage.select("nav, .nav, .navbar, [class*=nav], [id*=mw-panel], [class*=navigation], [id*=navigation], [class*=recirculation], [id*=recirculation]").remove();
 		//Removing headers
 		//htmlPage.select("header, .header, .head, #header, #head, [id*=mw-head]").remove();
-		htmlPage.select("[id*=mw-head]").remove();
+		//htmlPage.select("[id*=mw-head]").remove();
 		//Removing footers
-		htmlPage.select("footer, .footer, #footer, [class*=footer], [class*=bottom], [id*=bottom]").remove();
+		//htmlPage.select("footer, .footer, #footer, [class*=footer], [class*=bottom], [id*=bottom]").remove();
 		//Removing side bars
 		htmlPage.select(".sidebar, #sidebar, [class^=sidebar], aside, [class^=aside]").remove();
 		//Removing social media buttons
