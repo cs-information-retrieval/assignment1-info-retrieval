@@ -1,7 +1,6 @@
 package inforetrieval_part1.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 
 public class RobotsTxtParser
 {
@@ -24,6 +25,9 @@ public class RobotsTxtParser
         String file;
         String protocol;
         
+        urlString = this.checkHttpPrefix(urlString);
+        
+        String robotsTxtLink = "";
         boolean linkAllowed = true;
         
         try
@@ -32,15 +36,16 @@ public class RobotsTxtParser
             protocol = url.getProtocol();
             host = url.getHost();
             file = url.getFile();
-            InputStream in = new URL(protocol + "://" + host + "/robots.txt").openStream();
+            
+            robotsTxtLink = protocol + "://" + host + "/robots.txt";
+            Connection.Response response = null;
+            response = Jsoup.connect(robotsTxtLink).execute();
             
             // Reference:
             // https://stackoverflow.com/a/5445161
             StringWriter writer = new StringWriter();
-            IOUtils.copy(in, writer);
-            String robotsTxtContent = writer.toString();       
-            
-            in.close();
+            IOUtils.copy(response.bodyStream(), writer);
+            String robotsTxtContent = writer.toString();
             
             List<List<String>> results = buildAllowDisallowList(robotsTxtContent);
             List<String> allowList = results.get(0);
@@ -52,7 +57,7 @@ public class RobotsTxtParser
         } catch (MalformedURLException e1) {
             System.out.println("Malformed URL: " + urlString);
         } catch (IOException e2) {
-            System.out.println("Did not get robots.txt: " + urlString);
+            System.out.println("Did not get robots.txt: " + robotsTxtLink);
         }
         
         return linkAllowed;
@@ -197,5 +202,24 @@ public class RobotsTxtParser
         }
         
         return urlAllowed;
+    }
+    
+    /**
+     * Check if the string begins with either "http://" or "https://".
+     * If it doesn't, add "http" to the front
+     * @param url - URL to check
+     * @return
+     */
+    public String checkHttpPrefix(String url) {
+        String strPattern = "(?:^https:\\/\\/|^http:\\/\\/)([\\S]*)";
+        Pattern pattern = Pattern.compile(strPattern);
+        Matcher matcher = pattern.matcher(url);
+        
+        // If the string does not start with "https://" or "http://"
+        if (matcher.matches() == false) {
+            url = "http://" + url;
+        }
+        
+        return url;
     }
 }

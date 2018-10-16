@@ -289,7 +289,7 @@ public class SingleThreadedCrawler implements Controller {
         }
 
         // Generate a report for this website
-        this.generateReportHtml(statusCode, doc, numberOfNonvisitedLinks, totalNumberOfLinks);
+        this.generateReportHtml(statusCode, doc, numberOfNonvisitedLinks, totalNumberOfLinks, url);
         return foundLinks;
     }
 
@@ -319,7 +319,8 @@ public class SingleThreadedCrawler implements Controller {
      * @throws IOException
      */
     private void generateReportHtml(int statusCode, Document doc,
-            int numberOfNonvisitedLinks, int totalNumberOfLinks) throws IOException {
+            int numberOfNonvisitedLinks, int totalNumberOfLinks,
+            String url) throws IOException {
         String currentDir = System.getProperty("user.dir");
 
         int pageId = this.visitedList.size() - 1;
@@ -328,32 +329,30 @@ public class SingleThreadedCrawler implements Controller {
         String linkToDownloadedPage = "N/A";
         int httpStatusCode = statusCode;
         int numberOfImages = 0;
+        // Max length of link
+        int maxLinkLength = 20;
+        int maxDownloadedPageLength = maxLinkLength + 10;
 
         // Check if the website is successfully crawled
         if (doc != null) {
-            // Max length of link
-            int maxLinkLength = 20;
-            int maxDownloadedPageLength = maxLinkLength + 10;
-
             // Obtain the title from the webpage
             title = doc.title();
-
-            clickableUrl = "<a href=\"";
-            String clickableUrlTemp = doc.location();
-            clickableUrl += (clickableUrlTemp + "\">" + clickableUrlTemp + "</a>");
-
-            linkToDownloadedPage = "<a href=\"file:///";
-            String linkTemp = Paths.get(currentDir, "repository", "doc" + pageId + ".html").toString();
-            int linkTempSize = linkTemp.length();
-            if (linkTempSize < maxDownloadedPageLength) {
-                linkToDownloadedPage += (linkTemp + "\">" + linkTemp + "</a>");
-            } else {
-                linkToDownloadedPage += (linkTemp + "\">..."
-                        + linkTemp.substring(linkTempSize - maxDownloadedPageLength, linkTempSize)
-                        + "</a>");
-            }
-
             numberOfImages = doc.select("img").size();
+        }
+        
+        clickableUrl = "<a href=\"";
+        String clickableUrlTemp = url;
+        clickableUrl += (clickableUrlTemp + "\">" + clickableUrlTemp + "</a>");
+        
+        linkToDownloadedPage = "<a href=\"file:///";
+        String linkTemp = Paths.get(currentDir, "repository", "doc" + pageId + ".html").toString();
+        int linkTempSize = linkTemp.length();
+        if (linkTempSize < maxDownloadedPageLength) {
+            linkToDownloadedPage += (linkTemp + "\">" + linkTemp + "</a>");
+        } else {
+            linkToDownloadedPage += (linkTemp + "\">..."
+                    + linkTemp.substring(linkTempSize - maxDownloadedPageLength, linkTempSize)
+                    + "</a>");
         }
 
 
